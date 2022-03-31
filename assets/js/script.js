@@ -43,8 +43,47 @@ searchButton.addEventListener('click', googleAPI);
 // -------------------------------------------------------------
 
 // Rob ------------------------------------------------------------
-function wikiAPI() {
-    return;
+function wikiAPI(searchString) {
+    var searchQueryUrl;
+
+    //Test search string
+    // searchString = "Noosa Heads";
+
+    searchQueryUrl = "https://en.wikipedia.org/w/api.php?&action=query&list=search&srlimit=1&format=json&origin=*&srsearch=" + searchString;
+
+    //Nested fetches - first gets top search result for location entered. Second then gets details of wiki page for location and parses it.
+    fetch(searchQueryUrl)
+        .then(function (response) {
+            if (response.ok) {
+                return response.json();
+            } else {
+                //Capture API error and alert user
+                alert("Wikipedia API error: " + response.statusText);
+                console.log(response);
+                return;
+            }
+        })
+        .then(function (data) {
+            console.log("Top Wikipedia Search Page Found: " + data["query"]["search"][0]["title"]);
+            pageTile = data["query"]["search"][0]["title"];
+            parseUrl = "https://en.wikipedia.org/w/api.php?&action=parse&format=json&origin=*&page=" + pageTile;
+            fetch(parseUrl)
+                .then(function (response) {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        //Capture API error and alert user
+                        alert("Wikipedia API error: " + response.statusText);
+                        console.log(response);
+                        return;
+                    }
+                })
+                .then(function (data) {
+                    console.log("Wiki parsed data for the page " + pageTile);
+                    console.log(data);
+                });
+        });
+
 }
 // -------------------------------------------------------------
 
@@ -57,6 +96,10 @@ function display() {
 // -------------------------------------------------------------
 
 function init() {
+
+    //Test wiki api - outputs to console log.
+    wikiAPI("Noosa Heads");
+
     return;
 }
 
