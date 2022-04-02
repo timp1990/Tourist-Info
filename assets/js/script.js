@@ -114,7 +114,7 @@ function display() {
 
 function init() {
     // Setup Google maps section
-    // Create the script tag, set the appropriate attributes
+    // Create the script tag, set the appropriate attributes for Initial Google Map
     var script = document.createElement('script');
     script.src = 'https://maps.googleapis.com/maps/api/js?key=' + googleMapsAPIKey + '&callback=initMap';
     script.async = true;
