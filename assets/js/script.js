@@ -27,6 +27,8 @@ function googleAPI(event) {
     var GoogleObject = cityGoogleInfo(searchCity);
 }
 
+
+
 function initMap() {
     // The location of thisCity
     var thisCity = defaultCityCoords;
@@ -75,7 +77,6 @@ function codeAddress(cityForGeocode) {
 
 function cityGoogleInfo() {
     // https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=YOUR_API_KEY
-    // key=AIzaSyA34XiPx9LwWaNldbRx3On1mZH8fm1loZQ
     var latLongAPIRequest = "https://maps.googleapis.com/maps/api/geocode/json?address=" + searchCity + '&key=' + googleGeocodingAPIKey;
 
     fetch(latLongAPIRequest)
@@ -112,6 +113,12 @@ function display() {
 // -------------------------------------------------------------
 
 function init() {
+    // Setup Google maps section
+    // Create the script tag, set the appropriate attributes
+    var script = document.createElement('script');
+    script.src = 'https://maps.googleapis.com/maps/api/js?key=' + googleMapsAPIKey + '&callback=initMap';
+    script.async = true;
+    document.head.appendChild(script);
     return;
 }
 
