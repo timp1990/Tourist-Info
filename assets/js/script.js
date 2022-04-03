@@ -101,19 +101,26 @@ searchButton.addEventListener('click', googleAPI);
 // Rob ------------------------------------------------------------
 function wikiAPI(searchString) {
     var searchQueryUrl;
+    var sections;
+    var sectionList;
 
-    //Test search string
-    // searchString = "Noosa Heads";
+    //List of sections to be displayed
+    sectionList = {
+        "Geography": "true",
+        "History": "true",
+        "Heritage listings": "true",
+        "Education": "true",
+    };
 
     searchQueryUrl = "https://en.wikipedia.org/w/api.php?&action=query&list=search&srlimit=1&format=json&origin=*&srsearch=" + searchString;
 
-    //Nested fetches - first gets top search result for location entered. Second then gets details of wiki page for location and parses it.
+    //Nested fetches - first gets top search result for location entered. Second then gets sections of wiki page for location and parses it.
     fetch(searchQueryUrl)
         .then(function (response) {
             if (response.ok) {
                 return response.json();
             } else {
-                //Capture API error and alert user
+                //Capture API error and alert user NOTE: need CSS modal solution
                 alert("Wikipedia API error: " + response.statusText);
                 console.log(response);
                 return;
@@ -121,26 +128,74 @@ function wikiAPI(searchString) {
         })
         .then(function (data) {
             console.log("Top Wikipedia Search Page Found: " + data["query"]["search"][0]["title"]);
-            pageTile = data["query"]["search"][0]["title"];
-            parseUrl = "https://en.wikipedia.org/w/api.php?&action=parse&format=json&origin=*&page=" + pageTile;
+            pageTitle = data["query"]["search"][0]["title"];
+            parseUrl = "https://en.wikipedia.org/w/api.php?&action=parse&prop=sections&format=json&origin=*&page=" + pageTitle;
             fetch(parseUrl)
                 .then(function (response) {
                     if (response.ok) {
                         return response.json();
                     } else {
-                        //Capture API error and alert user
+                        //Capture API error and alert user NOTE: need CSS modal solution
                         alert("Wikipedia API error: " + response.statusText);
                         console.log(response);
                         return;
                     }
                 })
                 .then(function (data) {
-                    console.log("Wiki parsed data for the page " + pageTile);
-                    console.log(data);
+                    console.log("Wiki parsed data for the page " + pageTitle);
+
+                    //Get array of content section objects
+                    sections = data.parse.sections;
+                    //------------------------
+                    console.log(sections);
+                    //------------------------
+                    renderWikiSections(sections, sectionList, pageTitle);
                 });
         });
 
 }
+
+//Render wiki sections to HTML. Wrapper CSS class = mw-parser-output
+async function renderWikiSections(sections, sectionList, pageTitle) {
+    var sectionId;
+
+    //Loop through required sections and build html for main page
+    for (var key in sections) {
+        if (Object.hasOwnProperty.call(sections, key)) {
+
+            if (sectionList[sections[key]['line']] === "true") {
+
+                sectionId = parseInt(key) + 1;
+
+                parseUrl = "https://en.wikipedia.org/w/api.php?&action=parse&section=" + sectionId + "&format=json&disablelimitreport=true&disableeditsection=true&disabletoc=true&origin=*&page=" + pageTitle;
+
+                //Do wait on async fetch so sections get returned in order
+                var response = await fetch(parseUrl);
+                if (response.ok) {
+                    var json = await response.json();
+                } else {
+                    //Capture API error and alert user NOTE: need CSS modal solution
+                    alert("Wikipedia API error: " + response.statusText);
+                    console.log(response);
+                    return;
+                }
+                //------------------------
+                console.log(json);
+                //------------------------
+                //Get section HTML, remove reference links
+                wikiDom = $("<div>" + json.parse.text['*'] + "<div>");
+                wikiDom.find('sup').remove();
+                wikiDom.find('a').each(function () {
+                    $(this)
+                        .attr('href', 'http://en.wikipedia.org' + $(this).attr('href'));
+                });
+                //Render in HTML DOM
+                wikiDiv.innerHTML = wikiDiv.innerHTML + wikiDom[0].innerHTML;
+            }
+        }
+    }
+}
+
 // -------------------------------------------------------------
 
 
