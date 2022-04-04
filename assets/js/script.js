@@ -9,6 +9,7 @@ var mapDiv = document.getElementById('map-div');
 var wikiDiv = document.getElementById('wiki-div');
 
 // Declare Global Variables ---------------------------------
+var previousSearchObj={searchName:""};
 var googleMapsAPIKey = config.mapsKey;
 var googleGeocodingAPIKey = config.geocodingKey;
 var defaultCityCoords = { lat: -25.344, lng: 131.036 };
@@ -26,7 +27,6 @@ function googleAPI(event) {
     codeAddress(searchCity);
     var GoogleObject = cityGoogleInfo(searchCity);
 }
-
 
 
 function initMap() {
@@ -75,6 +75,7 @@ function codeAddress(cityForGeocode) {
     });
 }
 
+
 function cityGoogleInfo() {
     // https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=YOUR_API_KEY
     var latLongAPIRequest = "https://maps.googleapis.com/maps/api/geocode/json?address=" + searchCity + '&key=' + googleGeocodingAPIKey;
@@ -94,7 +95,8 @@ function cityGoogleInfo() {
         });
 
 }
-searchButton.addEventListener('click', googleAPI);
+
+//searchButton.addEventListener('click', googleAPI);
 
 // -------------------------------------------------------------
 
@@ -196,16 +198,57 @@ async function renderWikiSections(sections, sectionList, pageTitle) {
     }
 }
 
+//wikiAPI("Noosa Heads");
+
 // -------------------------------------------------------------
+//searchButton.addEventListener('click', googleAPI); see Andrew's coding.
 
+//--------------------------------------------------------------------------------------
+// Andrew codes
+// 1: Get previous serach from local storege to display
+function previousDisplay() {
+    if(previousSearch=JSON.parse(localStorage.getItem("previosSearchObj"))) {
+        searchCity=previousSearchObj.searchName;
+        searchString=previousSearchObj.searchName;
+    
+        var previousCity=document.createElement("p");
+        previousCity.innerText=previousSearchObj.searchName;
+        previousCity.attributes('class', 'previous-display')
+        previousPlacesDiv.appendChild(previousCity);
 
-// Andrew ------------------------------------------------------------
-function display() {
+        googleAPI();
+        wikiAPI();
+        
+        return;
+}}
+
+//2: clear previous search name
+clearButton.addEventListener('click', clear) 
+function clear() {
+    previousPlacesDiv.innerHTML="";
+    previousSearchObj={};
     return;
+
 }
 
-// -------------------------------------------------------------
+//3: save current search to local storage
+function saveSearch() {
+previousSearchObj.searchName=searchInput.value;
+localStorage.setItem(JSON.stringify(previousSearchObj));
+return;
+}
 
+//4: To start a search
+searchButton.addEventListener("click", startSearch)
+function startSearch() {
+
+    googleAPI();
+    wikiAPI(searchInput.value);
+    saveSearch();
+    return;
+
+}
+// 5: init
 function init() {
     // Setup Google maps section
     // Create the script tag, set the appropriate attributes for Initial Google Map
@@ -214,11 +257,8 @@ function init() {
     script.async = true;
     document.head.appendChild(script);
 
-    //Test wiki api - outputs to console log.
-    wikiAPI("Noosa Heads");
-
+    previousDisplay();
     return;
 }
 
-init();
-
+init(); 
