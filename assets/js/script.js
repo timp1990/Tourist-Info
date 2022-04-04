@@ -15,7 +15,7 @@ var googleGeocodingAPIKey = config.geocodingKey;
 var defaultCityCoords = { lat: -25.344, lng: 131.036 };
 var map;
 var cityGoogleObject = {}; // Object has .lat, .long , .address and .touristAttractionsSearchURL variables
-var searchCity = '';
+var searchCity = 'Sydney';
 
 // ----------------------------------------------------------
 
@@ -108,12 +108,11 @@ function wikiAPI(searchString) {
     var sections;
     var sectionList;
 
-    //List of sections to be displayed
+    //List of section types to be displayed
     sectionList = {
-        "Geography": "true",
-        "History": "true",
-        "Heritage listings": "true",
-        "Education": "true",
+        "Geography": "",
+        "Climate": "",
+        "History": ""
     };
 
     searchQueryUrl = "https://en.wikipedia.org/w/api.php?&action=query&list=search&srlimit=1&format=json&origin=*&srsearch=" + searchString;
@@ -151,6 +150,7 @@ function wikiAPI(searchString) {
                     //Get array of content section objects
                     sections = data.parse.sections;
                     //------------------------
+                    console.log("Wiki sections found for page");
                     console.log(sections);
                     //------------------------
                     renderWikiSections(sections, sectionList, pageTitle);
@@ -162,16 +162,38 @@ function wikiAPI(searchString) {
 //Render wiki sections to HTML. Wrapper CSS class = mw-parser-output
 async function renderWikiSections(sections, sectionList, pageTitle) {
     var sectionId;
+    var sectionText;
+    var wikiDom;
+    var delClimate = false;
 
-    //Loop through required sections and build html for main page
+    //Clear existing wiki info
+    wikiDiv.innerHTML = "";
+
+    //Get index values for required sections
     for (var key in sections) {
         if (Object.hasOwnProperty.call(sections, key)) {
 
-            if (sectionList[sections[key]['line']] === "true") {
+            if (sectionList.hasOwnProperty(sections[key]['line'])) {
+                sectionList[sections[key]['line']] = key;
+                if (sections[key]['line'] === "Geography") {
+                    delClimate = true;
+                }
+            }
+        }
+    }
 
-                sectionId = parseInt(key) + 1;
+    if (delClimate) {
+        delete sectionList.Climate;
+    }
 
-                parseUrl = "https://en.wikipedia.org/w/api.php?&action=parse&section=" + sectionId + "&format=json&disablelimitreport=true&disableeditsection=true&disabletoc=true&origin=*&page=" + pageTitle;
+    //Loop through required sections and build html for main page
+    for (var key in sectionList) {
+        if (Object.hasOwnProperty.call(sectionList, key)) {
+
+            sectionId = parseInt(sectionList[key]) + 1;
+
+            if (!isNaN(sectionId)) {
+                parseUrl = "https://en.wikipedia.org/w/api.php?&action=parse&section=" + sectionId + "&prop=text&format=json&&disableeditsection=true&disablelimitreport=true&disabletoc=true&origin=*&page=" + pageTitle;
 
                 //Do wait on async fetch so sections get returned in order
                 var response = await fetch(parseUrl);
@@ -183,21 +205,23 @@ async function renderWikiSections(sections, sectionList, pageTitle) {
                     console.log(response);
                     return;
                 }
-                //------------------------
-                console.log(json);
-                //------------------------
-                //Get section HTML, remove reference links
-                wikiDom = $("<div>" + json.parse.text['*'] + "<div>");
+                //------------------------git 
+                // console.log(json);
+                // //------------------------
+                //Get section HTML, remove image, sup and reference links
+                sectionText = json.parse.text['*'].replace(/<img[^>]*>/g, "");
+                sectionText = sectionText.replace(/<a[^>]*>/g, "");
+                wikiDom = $("<div>" + sectionText + "</div>");
                 wikiDom.find('sup').remove();
-                wikiDom.find('a').each(function () {
-                    $(this)
-                        .attr('href', 'http://en.wikipedia.org' + $(this).attr('href'));
-                });
+                wikiDom.find('.references').remove();
                 //Render in HTML DOM
                 wikiDiv.innerHTML = wikiDiv.innerHTML + wikiDom[0].innerHTML;
             }
+
         }
     }
+    //Add link to Wikipedia page
+    wikiDiv.innerHTML = wikiDiv.innerHTML + '<h4>See the full Wikipedia page<a href="https://en.wikipedia.org/wiki/' + pageTitle + '" target = "_blanc"> here</a></h2>'
 }
 
 //wikiAPI("Noosa Heads");
@@ -220,13 +244,18 @@ function previousDisplay() {
             previousPlacesDiv.appendChild(previousCity);
         
 
-        googleAPI();
+        // googleAPI(); causes error -----Rob
         wikiAPI(searchString);
+
         return;
+    } else {
+        //No stored searches so use default location
+        wikiAPI(searchCity);
     }
 }
 
 //2: clear previous search name
+
 clearButton.addEventListener('click', clearFunc) 
 function clearFunc() {
     previousPlacesDiv.innerHTML="";
@@ -246,12 +275,11 @@ return;
 //4: To start a search
 searchButton.addEventListener("click", startSearch)
 function startSearch(event) {
+    event.preventDefault();
     googleAPI(event);
     wikiAPI(searchInput.value);
 
-
     return;
-
 }
 // 5: init
 function init() {
