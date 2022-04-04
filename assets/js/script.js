@@ -9,7 +9,7 @@ var mapDiv = document.getElementById('map-div');
 var wikiDiv = document.getElementById('wiki-div');
 
 // Declare Global Variables ---------------------------------
-var previousSearchObj={searchName:""};
+var previousSearchObj = { searchName: "Sydney" };
 var googleMapsAPIKey = config.mapsKey;
 var googleGeocodingAPIKey = config.geocodingKey;
 var defaultCityCoords = { lat: -25.344, lng: 131.036 };
@@ -67,7 +67,9 @@ function codeAddress(cityForGeocode) {
             var marker = new google.maps.Marker({
                 map: map,
                 position: results[0].geometry.location
+
             });
+            saveSearch();
 
         } else {
             alert('Geocode was not successful for the following reason: ' + status);
@@ -207,44 +209,44 @@ async function renderWikiSections(sections, sectionList, pageTitle) {
 // Andrew codes
 // 1: Get previous serach from local storege to display
 function previousDisplay() {
-    if(previousSearch=JSON.parse(localStorage.getItem("previosSearchObj"))) {
-        searchCity=previousSearchObj.searchName;
-        searchString=previousSearchObj.searchName;
-    
-        var previousCity=document.createElement("p");
-        previousCity.innerText=previousSearchObj.searchName;
+    if (previousSearch = JSON.parse(localStorage.getItem("previousSearchObj"))) {  // Change from previousSearch to previousSearch Obj? ***********************************************
+        searchCity = previousSearchObj.searchName;
+        searchString = previousSearchObj.searchName;
+
+        var previousCity = document.createElement("p");
+        previousCity.innerText = previousSearchObj.searchName;
         previousCity.attributes('class', 'previous-display')
         previousPlacesDiv.appendChild(previousCity);
 
         googleAPI();
-        wikiAPI();
-        
+        wikiAPI(searchString);
         return;
-}}
+    }
+}
 
 //2: clear previous search name
-clearButton.addEventListener('click', clear) 
+clearButton.addEventListener('click', clear)
 function clear() {
-    previousPlacesDiv.innerHTML="";
-    previousSearchObj={};
+    previousPlacesDiv.innerHTML = "";
+    previousSearchObj = {};
     return;
 
 }
 
 //3: save current search to local storage
 function saveSearch() {
-previousSearchObj.searchName=searchInput.value;
-localStorage.setItem(JSON.stringify(previousSearchObj));
-return;
+    previousSearchObj.searchName = searchInput.value;
+    localStorage.setItem('previousSearchObj', JSON.stringify(previousSearchObj));
+    return;
 }
 
 //4: To start a search
 searchButton.addEventListener("click", startSearch)
-function startSearch() {
-
-    googleAPI();
+function startSearch(event) {
+    googleAPI(event);
     wikiAPI(searchInput.value);
-    saveSearch();
+
+
     return;
 
 }
