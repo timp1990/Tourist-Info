@@ -67,7 +67,9 @@ function codeAddress(cityForGeocode) {
             var marker = new google.maps.Marker({
                 map: map,
                 position: results[0].geometry.location
+
             });
+            saveSearch();
 
         } else {
             alert('Geocode was not successful for the following reason: ' + status);
@@ -219,10 +221,10 @@ function previousDisplay() {
         
 
         googleAPI();
-        wikiAPI();
-        
+        wikiAPI(searchString);
         return;
-}}
+    }
+}
 
 //2: clear previous search name
 clearButton.addEventListener('click', clearFunc) 
@@ -243,11 +245,11 @@ return;
 
 //4: To start a search
 searchButton.addEventListener("click", startSearch)
-function startSearch() {
-
-    googleAPI();
+function startSearch(event) {
+    googleAPI(event);
     wikiAPI(searchInput.value);
-    saveSearch();
+
+
     return;
 
 }
