@@ -9,7 +9,7 @@ var mapDiv = document.getElementById('map-div');
 var wikiDiv = document.getElementById('wiki-div');
 
 // Declare Global Variables ---------------------------------
-var previousSearchObj = { searchName: "Sydney" };
+var previousSearchObj={searchName:"sydney"};
 var googleMapsAPIKey = config.mapsKey;
 var googleGeocodingAPIKey = config.geocodingKey;
 var defaultCityCoords = { lat: -25.344, lng: 131.036 };
@@ -234,15 +234,15 @@ async function renderWikiSections(sections, sectionList, pageTitle) {
 // 1: Get previous serach from local storege to display
 function previousDisplay() {
 
-    if (previousSearch = JSON.parse(localStorage.getItem("previousSearchObj"))) {  // Change from previousSearch to previousSearch Obj? ***********************************************
-
-        searchCity = previousSearch.searchName;
-        searchString = previousSearch.searchName;
-
-        var previousCity = document.createElement("p");
-        previousCity.innerText = previousSearch.searchName;
-        previousCity.setAttribute('class', 'previous-display')
-        previousPlacesDiv.appendChild(previousCity);
+    if (JSON.parse(localStorage.getItem('previousSearches'))) {
+        previousSearchesObj= JSON.parse(localStorage.getItem('previousSearches'));
+      
+            searchCity=previousSearchObj.searchName;
+            searchString=previousSearchObj.searchName;
+            previousCity.innerText=previousSearchObj.searchName;
+            previousCity.setAttribute('class', 'previous-display')
+            previousPlacesDiv.appendChild(previousCity);
+        
 
         // googleAPI(); causes error -----Rob
         wikiAPI(searchString);
@@ -255,20 +255,21 @@ function previousDisplay() {
 }
 
 //2: clear previous search name
-clearButton.addEventListener('click', clear)
-function clear(event) {
-    event.preventDefault();
-    previousPlacesDiv.innerHTML = "";
-    previousSearchObj = {};
+
+clearButton.addEventListener('click', clearFunc) 
+function clearFunc() {
+    previousPlacesDiv.innerHTML="";
+    localStorage.clear();
     return;
 
 }
 
 //3: save current search to local storage
 function saveSearch() {
-    previousSearchObj.searchName = searchInput.value;
-    localStorage.setItem('previousSearchObj', JSON.stringify(previousSearchObj));
-    return;
+previousSearchObj.searchName=searchInput.value;
+localStorage.setItem('previousSearches', JSON.stringify(previousSearchesObj));
+
+return;
 }
 
 //4: To start a search
