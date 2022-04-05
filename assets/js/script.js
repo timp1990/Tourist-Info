@@ -7,15 +7,16 @@ var clearButton = document.getElementById('clear-button');
 var mainContentDiv = document.getElementById('main-content-div');
 var mapDiv = document.getElementById('map-div');
 var wikiDiv = document.getElementById('wiki-div');
-var preCityNameEl = document.getElementById('previous-name');
+var preCityNameEl = document.getElementById('previous-places-div');
 // Declare Global Variables ---------------------------------
 var previousSearchesObj = { searchName: [] };
 var googleMapsAPIKey = config.mapsKey;
 var googleGeocodingAPIKey = config.geocodingKey;
-var defaultCityCoords = { lat: -25.344, lng: 131.036 };
 var map;
 var cityGoogleObject = {}; // Object has .lat, .long , .address and .touristAttractionsSearchURL variables
-var defaultCity = 'Sydney';
+var defaultCityName = 'Sydney';
+var defaultCityCoords = { lat: -33.8688, lng: 151.2093 }; //Alice Springs
+// var defaultCityCoords = { lat: -25.344, lng: 131.036 }; //Aus Centre
 var searchCity;
 
 // ----------------------------------------------------------
@@ -59,7 +60,8 @@ function initMap() {
         );
         infoWindow.open(map);
     });
-    //Setup default map then call display
+
+    //Setup default map then call display to set local storage map
     previousDisplay();
 }
 
@@ -249,17 +251,18 @@ function previousDisplay() {
 
         // Display all previous searches
         for (var index = 0; index < nameArr.length; index++) {
-            previousCity = document.createElement('p');
-            previousCity.innerText = nameArr[index];
+            previousCity = document.createElement('button');
+            previousCity.textContent = nameArr[index];
+            previousCity.setAttribute('class', 'bg-slate-400 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded')
+            previousCity.setAttribute('value', index)
             preCityNameEl.appendChild(previousCity);
-            previousCity.setAttribute('class', 'previous-display')
         }
     }
 
     else {
         //No stored searches so use default location
-        googleAPI(defaultCity);
-        wikiAPI(defaultCity);
+        googleAPI(defaultCityName);
+        wikiAPI(defaultCityName);
     }
     return;
 }
@@ -277,6 +280,8 @@ function clearFunc(event) {
 }
 
 //3: Select previous searches from list
+
+
 
 preCityNameEl.addEventListener('click', select);
 function select(event) {
