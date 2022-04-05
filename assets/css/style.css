@@ -1,11 +1,9 @@
-/* Set the size of the div element that contains the map */
-#map-div {
-    height: 400px;
-    /* The height is 400 pixels */
-    width: 400px;
-    /* The width is the width of the web page */
-  }
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  html {
-      color: blue;
-  }
+
+.mw-headline {
+    font-size: large;
+    text-decoration: underline;
+}
