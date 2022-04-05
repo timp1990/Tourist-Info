@@ -7,9 +7,9 @@ var clearButton = document.getElementById('clear-button');
 var mainContentDiv = document.getElementById('main-content-div');
 var mapDiv = document.getElementById('map-div');
 var wikiDiv = document.getElementById('wiki-div');
-
+var preCityNameEl=document.getElementById('previous-name');
 // Declare Global Variables ---------------------------------
-var previousSearchObj={searchName:"sydney"};
+var previousSearchesObj={searchName:[""]};
 var googleMapsAPIKey = config.mapsKey;
 var googleGeocodingAPIKey = config.geocodingKey;
 var defaultCityCoords = { lat: -25.344, lng: 131.036 };
@@ -20,8 +20,8 @@ var searchCity = 'Sydney';
 // ----------------------------------------------------------
 
 // Tim ------------------------------------------------------------
-function googleAPI(event) {
-    event.preventDefault();
+function googleAPI() {
+    //event.preventDefault(); this has been executed at the start serach function on cilck event
     // Get the latitude and longitude of the searchCity
     searchCity = searchInput.value;
     codeAddress(searchCity);
@@ -231,57 +231,78 @@ async function renderWikiSections(sections, sectionList, pageTitle) {
 
 //--------------------------------------------------------------------------------------
 // Andrew codes
-// 1: Get previous serach from local storege to display
+// 1: Get previous searches from local storege to display
 function previousDisplay() {
 
-    if (JSON.parse(localStorage.getItem('previousSearches'))) {
-        previousSearchesObj= JSON.parse(localStorage.getItem('previousSearches'));
-      
-            searchCity=previousSearchObj.searchName;
-            searchString=previousSearchObj.searchName;
-            previousCity.innerText=previousSearchObj.searchName;
-            previousCity.setAttribute('class', 'previous-display')
-            previousPlacesDiv.appendChild(previousCity);
-        
-
-        // googleAPI(); causes error -----Rob
+        if (JSON.parse(localStorage.getItem('previousSearches'))!=null) {
+        var a= JSON.parse(localStorage.getItem('previousSearches'));
+        var nameArr=a.searchName;
+        searchCity=a[0];
+        searchString=a[0];
+    
+        // Display all previous searches
+        for (var index = 0; index < nameArr.length; index++) {    
+        previousCity=document.createElement('p');
+        previousCity.innerText=nameArr[index];
+        preCityNameEl.appendChild(previousCity);
+        previousCity.setAttribute('class', 'previous-display')
+        //googleAPI(); //causes error -----Rob
         wikiAPI(searchString);
+        }}
 
-        return;
-    } else {
+        else {
+        previousCity.innerText=searchCity;
         //No stored searches so use default location
         wikiAPI(searchCity);
+        }
+        return;
     }
-}
+
 
 //2: clear previous search name
 
 clearButton.addEventListener('click', clearFunc) 
 function clearFunc() {
-    previousPlacesDiv.innerHTML="";
+    preCityNameEl.innerHTML="";
     localStorage.clear();
     return;
 
 }
 
-//3: save current search to local storage
+//3: Select previous searches from list
+
+preCityNameEl.addEventListener('click', select);
+function select(event) {
+    var city = event.target.textContent;
+    searchCity=city;
+    googleAPI(city);
+    wikiAPI(city);
+console.log(city);
+    
+    return;
+}
+
+//4: save current search to local storage
 function saveSearch() {
-previousSearchObj.searchName=searchInput.value;
+previousSearchesObj.searchName.push(searchInput.value);
 localStorage.setItem('previousSearches', JSON.stringify(previousSearchesObj));
 
 return;
 }
 
-//4: To start a search
+//5: To start a search
 searchButton.addEventListener("click", startSearch)
 function startSearch(event) {
     event.preventDefault();
-    googleAPI(event);
+    googleAPI();
     wikiAPI(searchInput.value);
 
     return;
 }
-// 5: init
+
+
+
+// 6: init
 function init() {
     // Setup Google maps section
     // Create the script tag, set the appropriate attributes for Initial Google Map
