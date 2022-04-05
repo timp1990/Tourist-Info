@@ -7,36 +7,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="./assets/css/style.css" />
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <title>Tourist Info</title>
 </head>
 
-<body>
+<body class="bg-amber-100">
     <header>
-        <h1>Tourist Info</h1>
+        <h1 class=" text-6xl underline bg-amber-500 py-8 px-4 border-4 border-orange-600 border-solid rounded-2xl">
+            Tourist
+            Info</h1>
     </header>
 
     <main>
         <div id="main-wrapper-div">
-            <div id="side-bar-div">
-                <form id="search-form">
-                    <label> Search for a city : </label>
-                    <input id="search-input">
-                    <button id="search-button" type="submit"> Submit </button>
-                </form>
-                <h2>Previous Searches</h2>
-                <div id="previous-places-div">
+            <div id="interactivity-div"
+                class="flex flex-row flex-wrap justify-center pb-8 bg-gradient-to-b from-amber-500 to-amber-100 border-4 border-orange-600 border-solid rounded-2xl">
+                <div id="side-bar-div" class="flex flex-col flex-wrap w-4/12">
+                    <form id="search-form">
+                        <label class="text-3xl my-4"> Search for a city : </label>
+                        <input id="search-input"
+                            class="shadow appearance-none border border-black rounded w-full py-2 px-3 my-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <button id="search-button" type="submit"
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"> Submit
+                        </button>
+                    </form>
+                    <div id="previous-places-div">
+                        <h2 class="text-4xl">Previous Searches</h2>
 
+                        <div id="previous-name"></div>
+
+                    </div>
+                    <button id="clear-button"
+                        class="bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Clear </button>
 
                 </div>
-                <button id="clear-button"> Clear </button>
+                <div id="map-div" class="w-6/12 mx-4"></div>
             </div>
-            <div id="main-content-div">
-                <div id="map-div"></div>
+            <div id="main-content-div" class="flex flex-row flex-wrap justify-center px-8 py-8 bg-amber-100">
                 <div id="wiki-div"></div>
             </div>
         </div>
     </main>
-    <footer> Made by Daniel, Tim, Rob, Andrew </footer>
+    <footer class="border-4 border-orange-600 border-solid rounded-2xl w-3/6 flex flex-row justify-center items-center">
+        Made by
+        Tim, Rob & Andrew </footer>
 
     <script type='text/javascript' src='config.js'></script>
     <script src="./assets/js/script.js"></script>
