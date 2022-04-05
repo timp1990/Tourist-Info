@@ -12,51 +12,51 @@
 </head>
 
 <body class="bg-amber-100">
-    <header>
-        <h1 class=" text-6xl underline bg-amber-500 py-8 px-4 border-4 border-orange-600 border-solid rounded-2xl">
+    <header class="container mx-auto mt-3 mb-3">
+        <h1
+            class="text-center text-6xl underline bg-amber-500 py-8 px-4 border-4 border-orange-600 border-solid rounded-2xl">
             Tourist
             Info</h1>
     </header>
 
     <main>
-        <div id="main-wrapper-div">
-            <div id="interactivity-div"
-                class="flex flex-row flex-wrap justify-center pb-8 bg-gradient-to-b from-amber-500 to-amber-100 border-4 border-orange-600 border-solid rounded-2xl">
-                <div id="side-bar-div" class="flex flex-col flex-wrap w-4/12">
-                    <form id="search-form">
-                        <label class="text-3xl my-4"> Search for a city : </label>
-                        <input id="search-input"
-                            class="shadow appearance-none border border-black rounded w-full py-2 px-3 my-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        <button id="search-button" type="submit"
-                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"> Submit
-                        </button>
-                    </form>
-                    <div id="previous-places-div">
-                        <h2 class="text-4xl">Previous Searches</h2>
+        <section
+            class="container mx-auto flex flex-wrap justify-center pt-4 pb-4 bg-gradient-to-b from-amber-500 to-amber-100 border-4 border-orange-600 border-solid rounded-2xl"
+            id="interactivity-div">
 
-                        <div id="previous-name"></div>
+            <aside id="side-bar-div" class="w-3/12">
+                <form id="search-form">
+                    <label class="text-3xl my-4"> Search for a city :</label>
+                    <input id="search-input"
+                        class="shadow appearance-none border border-black rounded w-full py-2 px-3 my-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline w-80 block">
+                    <button id="search-button" type="submit"
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"> Submit
+                    </button>
+                </form>
+                <h3 class="text-2xl">Previous Searches</h3>
+                <form id="previous-form">
+                    <div id="previous-places-div"></div>
+                </form>
+                <button id="clear-button"
+                    class="bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-80">Clear
+                    Searches</button>
+            </aside>
 
-                    </div>
-                    <button id="clear-button"
-                        class="bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        Clear </button>
+            <div id="map-div" class="mx-4 w-3/12"></div>
 
-                </div>
-                <div id="map-div" class="w-6/12 mx-4"></div>
-            </div>
-            <div id="main-content-div" class="flex flex-row flex-wrap justify-center px-8 py-8 bg-amber-100">
-                <div id="wiki-div"></div>
-            </div>
-        </div>
+        </section>
+        <section id="main-content-div" class="container mx-auto px-8 py-8 bg-amber-100">
+            <div id="wiki-div"></div>
+        </section>
+
     </main>
-    <footer class="border-4 border-orange-600 border-solid rounded-2xl w-3/6 flex flex-row justify-center items-center">
+    <footer
+        class=" mx-auto border-4 border-orange-600 border-solid rounded-2xl w-3/6 flex flex-row justify-center items-center">
         Made by
         Tim, Rob & Andrew </footer>
 
     <script type='text/javascript' src='config.js'></script>
     <script src="./assets/js/script.js"></script>
-
-    <!-- Added JQuery to help parse wiki data - Rob -->
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
 
 </body>

@@ -1,5 +1,6 @@
 // Connect to HTML
 var searchForm = document.getElementById('search-form');
+var previousForm = document.getElementById('previous-form');
 var searchInput = document.getElementById('search-input');
 var searchButton = document.getElementById('search-button');
 var previousPlacesDiv = document.getElementById('previous-places-div');
@@ -62,7 +63,7 @@ function initMap() {
     });
 
     //Setup default map then call display to set local storage map
-    previousDisplay();
+    defaultDisplay();
 }
 
 function codeAddress(cityForGeocode) {
@@ -237,8 +238,8 @@ async function renderWikiSections(sections, sectionList, pageTitle) {
 
 //--------------------------------------------------------------------------------------
 // Andrew codes
-// 1: Get previous searches from local storege to display
-function previousDisplay() {
+// 1: Get local storege city to display or display default city
+function defaultDisplay() {
 
     if (JSON.parse(localStorage.getItem('previousSearches')) != null) {
         var a = JSON.parse(localStorage.getItem('previousSearches'));
@@ -249,14 +250,8 @@ function previousDisplay() {
         googleAPI(searchCity);
         wikiAPI(searchCity);
 
-        // Display all previous searches
-        for (var index = 0; index < nameArr.length; index++) {
-            previousCity = document.createElement('button');
-            previousCity.textContent = nameArr[index];
-            previousCity.setAttribute('class', 'bg-slate-400 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded')
-            previousCity.setAttribute('value', index)
-            preCityNameEl.appendChild(previousCity);
-        }
+        previousDisplayRefresh();
+
     }
 
     else {
@@ -267,9 +262,28 @@ function previousDisplay() {
     return;
 }
 
+//1.1 Previous display Refresh
+function previousDisplayRefresh() {
+
+    if (JSON.parse(localStorage.getItem('previousSearches')) != null) {
+        var a = JSON.parse(localStorage.getItem('previousSearches'));
+        var nameArr = a.searchName;
+
+        // Display all previous searches
+        preCityNameEl.innerHTML = "";
+        for (var index = 0; index < nameArr.length; index++) {
+            previousCity = document.createElement('button');
+            previousCity.textContent = nameArr[index];
+            previousCity.setAttribute('class', 'bg-slate-400 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded block w-80 mb-2')
+            previousCity.setAttribute('value', index)
+            preCityNameEl.appendChild(previousCity);
+        }
+
+        return;
+    }
+}
 
 //2: clear previous search name
-
 clearButton.addEventListener('click', clearFunc)
 function clearFunc(event) {
     event.preventDefault();
@@ -280,19 +294,13 @@ function clearFunc(event) {
 }
 
 //3: Select previous searches from list
-
-
-
-preCityNameEl.addEventListener('click', select);
+previousForm.addEventListener('click', select);
 function select(event) {
     event.preventDefault();
-    var city = event.target.textContent;
-    searchCity = city;
-    googleAPI(city);
-    wikiAPI(city);
-    console.log(city);
 
-    return;
+    searchCity = event.target.textContent;
+    googleAPI(searchCity);
+    wikiAPI(searchCity);
 }
 
 //4: save current search to local storage
@@ -312,6 +320,9 @@ function saveSearch(searchCity) {
         localStorage.setItem('previousSearches', JSON.stringify(previousSearchesObj));
     }
 
+    //Refresh previous searches display
+    previousDisplayRefresh();
+
     return;
 }
 
@@ -319,9 +330,11 @@ function saveSearch(searchCity) {
 searchButton.addEventListener("click", startSearch)
 function startSearch(event) {
     event.preventDefault();
-    googleAPI(searchInput.value);
-    wikiAPI(searchInput.value);
 
+    if (searchInput.value != "" && searchInput.value != undefined) {
+        googleAPI(searchInput.value);
+        wikiAPI(searchInput.value);
+    }
     return;
 }
 
@@ -329,13 +342,11 @@ function startSearch(event) {
 // 6: init
 function init() {
     // Setup Google maps section
-    // Create the script tag, set the appropriate attributes for Initial Google Map
+    // Create the script tag, set the appropriate attributes for Initial Google Map. initMap function called.
     var script = document.createElement('script');
     script.src = 'https://maps.googleapis.com/maps/api/js?key=' + googleMapsAPIKey + '&callback=initMap';
     script.async = true;
     document.head.appendChild(script);
-
-    // previousDisplay(); Can't call this here. Call after google map Init
 
     return;
 }
