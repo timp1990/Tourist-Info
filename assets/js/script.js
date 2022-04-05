@@ -7,23 +7,27 @@ var clearButton = document.getElementById('clear-button');
 var mainContentDiv = document.getElementById('main-content-div');
 var mapDiv = document.getElementById('map-div');
 var wikiDiv = document.getElementById('wiki-div');
-var preCityNameEl=document.getElementById('previous-name');
+var preCityNameEl = document.getElementById('previous-name');
 // Declare Global Variables ---------------------------------
-var previousSearchesObj={searchName:[""]};
+var previousSearchesObj = { searchName: [] };
 var googleMapsAPIKey = config.mapsKey;
 var googleGeocodingAPIKey = config.geocodingKey;
 var defaultCityCoords = { lat: -25.344, lng: 131.036 };
 var map;
 var cityGoogleObject = {}; // Object has .lat, .long , .address and .touristAttractionsSearchURL variables
-var searchCity = 'Sydney';
+var defaultCity = 'Sydney';
+var searchCity;
 
 // ----------------------------------------------------------
 
 // Tim ------------------------------------------------------------
-function googleAPI() {
-    //event.preventDefault(); this has been executed at the start serach function on cilck event
+function googleAPI(searchCity) {
     // Get the latitude and longitude of the searchCity
-    searchCity = searchInput.value;
+
+    if (searchCity === "" || searchCity === undefined) {
+        searchCity = searchInput.value;
+    }
+
     codeAddress(searchCity);
     var GoogleObject = cityGoogleInfo(searchCity);
 }
@@ -55,6 +59,8 @@ function initMap() {
         );
         infoWindow.open(map);
     });
+    //Setup default map then call display
+    previousDisplay();
 }
 
 function codeAddress(cityForGeocode) {
@@ -69,7 +75,7 @@ function codeAddress(cityForGeocode) {
                 position: results[0].geometry.location
 
             });
-            saveSearch();
+            saveSearch(cityForGeocode);
 
         } else {
             alert('Geocode was not successful for the following reason: ' + status);
@@ -224,8 +230,6 @@ async function renderWikiSections(sections, sectionList, pageTitle) {
     wikiDiv.innerHTML = wikiDiv.innerHTML + '<h4>See the full Wikipedia page<a href="https://en.wikipedia.org/wiki/' + pageTitle + '" target = "_blanc"> here</a></h2>'
 }
 
-//wikiAPI("Noosa Heads");
-
 // -------------------------------------------------------------
 //searchButton.addEventListener('click', googleAPI); see Andrew's coding.
 
@@ -234,37 +238,40 @@ async function renderWikiSections(sections, sectionList, pageTitle) {
 // 1: Get previous searches from local storege to display
 function previousDisplay() {
 
-        if (JSON.parse(localStorage.getItem('previousSearches'))!=null) {
-        var a= JSON.parse(localStorage.getItem('previousSearches'));
-        var nameArr=a.searchName;
-        searchCity=a[0];
-        searchString=a[0];
-    
-        // Display all previous searches
-        for (var index = 0; index < nameArr.length; index++) {    
-        previousCity=document.createElement('p');
-        previousCity.innerText=nameArr[index];
-        preCityNameEl.appendChild(previousCity);
-        previousCity.setAttribute('class', 'previous-display')
-        //googleAPI(); //causes error -----Rob
-        wikiAPI(searchString);
-        }}
+    if (JSON.parse(localStorage.getItem('previousSearches')) != null) {
+        var a = JSON.parse(localStorage.getItem('previousSearches'));
+        var nameArr = a.searchName;
+        searchCity = nameArr[0];
 
-        else {
-        previousCity.innerText=searchCity;
-        //No stored searches so use default location
+        //Call google maps and wiki APIs
+        googleAPI(searchCity);
         wikiAPI(searchCity);
+
+        // Display all previous searches
+        for (var index = 0; index < nameArr.length; index++) {
+            previousCity = document.createElement('p');
+            previousCity.innerText = nameArr[index];
+            preCityNameEl.appendChild(previousCity);
+            previousCity.setAttribute('class', 'previous-display')
         }
-        return;
     }
+
+    else {
+        //No stored searches so use default location
+        googleAPI(defaultCity);
+        wikiAPI(defaultCity);
+    }
+    return;
+}
 
 
 //2: clear previous search name
 
-clearButton.addEventListener('click', clearFunc) 
-function clearFunc() {
-    preCityNameEl.innerHTML="";
-    localStorage.clear();
+clearButton.addEventListener('click', clearFunc)
+function clearFunc(event) {
+    event.preventDefault();
+    preCityNameEl.innerHTML = "";
+    localStorage.removeItem('previousSearches');
     return;
 
 }
@@ -273,33 +280,45 @@ function clearFunc() {
 
 preCityNameEl.addEventListener('click', select);
 function select(event) {
+    event.preventDefault();
     var city = event.target.textContent;
-    searchCity=city;
+    searchCity = city;
     googleAPI(city);
     wikiAPI(city);
-console.log(city);
-    
+    console.log(city);
+
     return;
 }
 
 //4: save current search to local storage
-function saveSearch() {
-previousSearchesObj.searchName.push(searchInput.value);
-localStorage.setItem('previousSearches', JSON.stringify(previousSearchesObj));
+function saveSearch(searchCity) {
+    //Check if local storage exists
+    if (JSON.parse(localStorage.getItem('previousSearches')) != null) {
+        var a = JSON.parse(localStorage.getItem('previousSearches'));
+        //Check if city already saved
+        if (a.searchName.indexOf(searchCity) < 0) {
+            //Add city to local storage
+            a.searchName.push(searchCity);
+            localStorage.setItem('previousSearches', JSON.stringify(a));
+        }
+    } else {
+        //No local storage yet so create and city
+        previousSearchesObj.searchName.push(searchCity);
+        localStorage.setItem('previousSearches', JSON.stringify(previousSearchesObj));
+    }
 
-return;
+    return;
 }
 
 //5: To start a search
 searchButton.addEventListener("click", startSearch)
 function startSearch(event) {
     event.preventDefault();
-    googleAPI();
+    googleAPI(searchInput.value);
     wikiAPI(searchInput.value);
 
     return;
 }
-
 
 
 // 6: init
@@ -311,7 +330,8 @@ function init() {
     script.async = true;
     document.head.appendChild(script);
 
-    previousDisplay();
+    // previousDisplay(); Can't call this here. Call after google map Init
+
     return;
 }
 
