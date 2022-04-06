@@ -7,3 +7,16 @@
     font-size: large;
     text-decoration: underline;
 }
+
+/* Set the size of the div element that contains the map */
+#map-div {
+    height: 400px;
+    width: 95%;
+}
+
+@media screen and (min-width: 768px) {
+    #map-div {
+        height: 400px;
+        width: 50%;
+    }
+}
