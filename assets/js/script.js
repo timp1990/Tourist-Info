@@ -309,17 +309,27 @@ function saveSearch(searchCity) {
     if (JSON.parse(localStorage.getItem('previousSearches')) != null) {
         var a = JSON.parse(localStorage.getItem('previousSearches'));
         //Check if city already saved
-        if (a.searchName.indexOf(searchCity) < 0) {
+        
+// Andrew adds on features that max 4 previous dsiplays. The most recent search will be on top, the buttom one will be removed when over limit.
+        if (a.searchName.indexOf(searchCity) < 0 && a.searchName.length<4 ) {
             //Add city to local storage
-            a.searchName.push(searchCity);
+            a.searchName.unshift(searchCity);
             localStorage.setItem('previousSearches', JSON.stringify(a));
+        
         }
-    } else {
+     
+        else if(a.searchName.indexOf(searchCity) < 0 && a.searchName.length===4) {
         //No local storage yet so create and city
-        previousSearchesObj.searchName.push(searchCity);
-        localStorage.setItem('previousSearches', JSON.stringify(previousSearchesObj));
-    }
+        a.searchName.pop();
+        a.searchName.unshift(searchCity);
+        localStorage.setItem('previousSearches', JSON.stringify(a));
+        
+    }}
 
+    else {
+    previousSearchesObj.searchName.unshift(searchCity);
+    localStorage.setItem('previousSearches', JSON.stringify(previousSearchesObj));
+    }
     //Refresh previous searches display
     previousDisplayRefresh();
 
