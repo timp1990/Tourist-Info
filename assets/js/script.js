@@ -9,6 +9,8 @@ var mainContentDiv = document.getElementById('main-content-div');
 var mapDiv = document.getElementById('map-div');
 var wikiDiv = document.getElementById('wiki-div');
 var preCityNameEl = document.getElementById('previous-places-div');
+var popupBut = document.getElementById('popupModal-but');
+
 // Declare Global Variables ---------------------------------
 var previousSearchesObj = { searchName: [] };
 var googleMapsAPIKey = config.mapsKey;
@@ -81,7 +83,7 @@ function codeAddress(cityForGeocode) {
             saveSearch(cityForGeocode);
 
         } else {
-            alert('Geocode was not successful for the following reason: ' + status);
+            popup("show", "Alert", 'Geocode was not successful for the following reason: ' + status, "Cancel");
         }
     });
 }
@@ -132,8 +134,7 @@ function wikiAPI(searchString) {
             if (response.ok) {
                 return response.json();
             } else {
-                //Capture API error and alert user NOTE: need CSS modal solution
-                alert("Wikipedia API error: " + response.statusText);
+                popup("show", "Alert", "Wikipedia API error: " + response.statusText, "Cancel");
                 console.log(response);
                 return;
             }
@@ -147,8 +148,7 @@ function wikiAPI(searchString) {
                     if (response.ok) {
                         return response.json();
                     } else {
-                        //Capture API error and alert user NOTE: need CSS modal solution
-                        alert("Wikipedia API error: " + response.statusText);
+                        popup("show", "Alert", "Wikipedia API error: " + response.statusText, "Cancel");
                         console.log(response);
                         return;
                     }
@@ -209,8 +209,7 @@ async function renderWikiSections(sections, sectionList, pageTitle) {
                 if (response.ok) {
                     var json = await response.json();
                 } else {
-                    //Capture API error and alert user NOTE: need CSS modal solution
-                    alert("Wikipedia API error: " + response.statusText);
+                    popup("show", "Alert", "Wikipedia API error: " + response.statusText, "Cancel");
                     console.log(response);
                     return;
                 }
@@ -344,8 +343,34 @@ function startSearch(event) {
     if (searchInput.value != "" && searchInput.value != undefined) {
         googleAPI(searchInput.value);
         wikiAPI(searchInput.value);
+    } else {
+        popup("show", "Alert", "Please enter place to search.", "Ok");
     }
     return;
+}
+
+popupBut.addEventListener("click", buttonSelected)
+function buttonSelected(event) {
+    event.preventDefault();
+
+    popup("hide");
+
+    return;
+}
+
+function popup(action, title, description, button) {
+    var popup = document.getElementById('modal');
+    var popupTitle = document.getElementById('popupModal-title');
+    var popupDesc = document.getElementById('popupModal-desc');
+
+    if (action === "show") {
+        popupTitle.textContent = title;
+        popupDesc.textContent = description;
+        popupBut.textContent = button;
+        popup.style.display = "block";
+    } else if (action === "hide") {
+        popup.style.display = "none";
+    }
 }
 
 
@@ -357,6 +382,7 @@ function init() {
     script.src = 'https://maps.googleapis.com/maps/api/js?key=' + googleMapsAPIKey + '&callback=initMap';
     script.async = true;
     document.head.appendChild(script);
+
 
     return;
 }
