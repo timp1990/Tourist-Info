@@ -24,3 +24,13 @@
 .pre-search {
     margin-top: 10px;
 }
+
+.mw-headline {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.mw-page-title {
+    font-size: 20px;
+    font-weight: bold;
+}
