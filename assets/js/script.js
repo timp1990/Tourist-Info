@@ -176,7 +176,8 @@ async function renderWikiSections(sections, sectionList, pageTitle) {
     var delClimate = false;
 
     //Clear existing wiki info
-    wikiDiv.innerHTML = "";
+    wikiDiv.innerHTML = '<p class="mw-page-title">Wikipedia Location Summary</p>';
+
 
     //Get index values for required sections
     for (var key in sections) {
@@ -230,6 +231,7 @@ async function renderWikiSections(sections, sectionList, pageTitle) {
     }
     //Add link to Wikipedia page
     wikiDiv.innerHTML = wikiDiv.innerHTML + '<h4>See the full Wikipedia page<a href="https://en.wikipedia.org/wiki/' + pageTitle + '" target = "_blanc"> here</a></h2>'
+    wikiAPI
 }
 
 // -------------------------------------------------------------
@@ -305,32 +307,33 @@ function select(event) {
 //4: save current search to local storage
 function saveSearch(searchCity) {
     // Turn the first letter of searched city name to uppercase for better display
-    var name=searchCity.charAt(0).toUpperCase() + searchCity.slice(1);
+    var name = searchCity.charAt(0).toUpperCase() + searchCity.slice(1);
     //Check if local storage exists
     if (JSON.parse(localStorage.getItem('previousSearches')) != null) {
         var a = JSON.parse(localStorage.getItem('previousSearches'));
         //Check if city already saved
-        
-        
-// Andrew adds on features that max 4 previous dsiplays. The most recent search will be on top, the buttom one will be removed when over limit.
-        if (a.searchName.indexOf(name) < 0 && a.searchName.length<4 ) {
+
+
+        // Andrew adds on features that max 4 previous dsiplays. The most recent search will be on top, the buttom one will be removed when over limit.
+        if (a.searchName.indexOf(name) < 0 && a.searchName.length < 4) {
             //Add city to local storage
             a.searchName.unshift(name);
             localStorage.setItem('previousSearches', JSON.stringify(a));
-        
+
         }
-     
-        else if(a.searchName.indexOf(name) < 0 && a.searchName.length===4) {
-        //No local storage yet so create and city
-        a.searchName.pop();
-        a.searchName.unshift(name);
-        localStorage.setItem('previousSearches', JSON.stringify(a));
-        
-    }}
+
+        else if (a.searchName.indexOf(name) < 0 && a.searchName.length === 4) {
+            //No local storage yet so create and city
+            a.searchName.pop();
+            a.searchName.unshift(name);
+            localStorage.setItem('previousSearches', JSON.stringify(a));
+
+        }
+    }
 
     else {
-    previousSearchesObj.searchName.unshift(name);
-    localStorage.setItem('previousSearches', JSON.stringify(previousSearchesObj));
+        previousSearchesObj.searchName.unshift(name);
+        localStorage.setItem('previousSearches', JSON.stringify(previousSearchesObj));
     }
     //Refresh previous searches display
     previousDisplayRefresh();
